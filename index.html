@@ -2,64 +2,66 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Noxa Cloud | Management Dashboard</title>
+    <title>Noxa Cloud | Executive Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
-        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #020202; --card: rgba(10, 10, 10, 0.85); }
+        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #020202; }
         
         body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; margin: 0; }
         
-        /* Arka Plan Grid Efekti */
-        body::before {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px; z-index: -1;
+        /* Arka Plan Hareketli Grid */
+        .bg-grid {
+            background-image: linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+            background-size: 45px 45px;
+            height: 100vh; width: 100vw; position: fixed; z-index: -1;
         }
 
-        .glass { background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(0, 102, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(0, 102, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.7); }
         
-        /* Sekme Animasyonları */
-        .tab-content { display: none; opacity: 0; transform: translateY(15px); transition: all 0.4s ease-out; }
-        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+        /* Sekme Geçiş Efektleri */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: slideUp 0.5s ease-out forwards; }
         
-        .nav-btn { position: relative; transition: all 0.3s; color: #666; }
-        .nav-btn.active { color: white; background: rgba(0, 102, 255, 0.1); border-right: 3px solid var(--safir); }
-        .nav-btn:hover:not(.active) { color: #aaa; background: rgba(255,255,255,0.02); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .stat-card { transition: transform 0.3s; }
-        .stat-card:hover { transform: translateY(-5px); border-color: var(--safir); }
+        .nav-btn { transition: all 0.3s; color: #555; border-radius: 20px; }
+        .nav-btn.active { color: white; background: rgba(0, 102, 255, 0.1); border-right: 4px solid var(--safir); }
+        
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
     </style>
 </head>
-<body class="h-screen flex p-6 gap-6">
+<body class="flex p-6 gap-6 h-screen">
+    <div class="bg-grid"></div>
 
     <aside class="w-80 glass rounded-[45px] p-8 flex flex-col">
-        <div class="mb-12 px-2">
-            <h1 class="font-orbitron text-2xl font-black tracking-tighter">NOXA <span class="text-blue-500 italic">CLOUD</span></h1>
-            <div class="h-1 w-12 bg-blue-600 mt-1 rounded-full"></div>
+        <div class="mb-14 px-2">
+            <h1 class="font-orbitron text-2xl font-black tracking-tighter">NOXA <span class="text-blue-500 italic">AC</span></h1>
+            <p class="text-[9px] text-blue-400 tracking-[5px] uppercase opacity-50 font-bold">Cloud Infrastructure</p>
         </div>
 
         <nav class="flex-1 space-y-3">
-            <button onclick="switchTab('dash', this)" class="nav-btn active w-full flex items-center p-4 rounded-2xl">
-                <i class="fas fa-chart-line mr-4 w-5"></i> Dashboard
+            <button onclick="switchTab('dash', this)" class="nav-btn active w-full flex items-center p-4">
+                <i class="fas fa-microchip mr-4 w-5"></i> Dashboard
             </button>
-            <button onclick="switchTab('players', this)" class="nav-btn w-full flex items-center p-4 rounded-2xl">
-                <i class="fas fa-users mr-4 w-5"></i> Sunucu / Oyuncu
+            <button onclick="switchTab('players', this)" class="nav-btn w-full flex items-center p-4">
+                <i class="fas fa-users-viewfinder mr-4 w-5"></i> Oyuncular
             </button>
-            <button onclick="switchTab('install', this)" class="nav-btn w-full flex items-center p-4 rounded-2xl text-blue-400">
-                <i class="fas fa-cloud-arrow-down mr-4 w-5"></i> Kurulum & İndir
+            <button onclick="switchTab('bans', this)" class="nav-btn w-full flex items-center p-4">
+                <i class="fas fa-user-slash mr-4 w-5"></i> Ban Listesi
             </button>
-            <button onclick="switchTab('settings', this)" class="nav-btn w-full flex items-center p-4 rounded-2xl">
-                <i class="fas fa-shield-halved mr-4 w-5"></i> AC Ayarları
+            <button onclick="switchTab('install', this)" class="nav-btn w-full flex items-center p-4 text-blue-400">
+                <i class="fas fa-download mr-4 w-5"></i> Kurulum & İndir
             </button>
         </nav>
 
         <div class="mt-auto glass p-6 rounded-[30px] border-none bg-white/[0.03]">
-            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Status</p>
-            <p id="srvStatus" class="font-bold text-sm text-blue-500">SUNUCU BEKLENİYOR...</p>
-            <div class="flex items-center mt-2 text-[10px] text-green-500 font-bold">
-                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span> SYSTEM ONLINE
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Eşleşen Sunucu</p>
+            <p id="srvName" class="font-bold text-sm text-blue-500 uppercase">Wia Roleplay</p>
+            <div class="flex items-center mt-3 text-[10px] text-green-500 font-bold">
+                <span class="status-dot bg-green-500 animate-pulse"></span> SYSTEM ACTIVE
             </div>
         </div>
     </aside>
@@ -68,93 +70,96 @@
         
         <div id="tab-dash" class="tab-content active h-full flex flex-col gap-6">
             <div class="grid grid-cols-3 gap-6">
-                <div class="glass stat-card p-10 rounded-[50px]">
-                    <p class="text-[10px] text-gray-500 font-black uppercase tracking-[3px] mb-2">Aktif Oyuncu</p>
-                    <p class="text-4xl font-orbitron font-black text-white">--</p>
+                <div class="glass p-10 rounded-[50px] relative overflow-hidden group">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">Canlı Oyuncu</p>
+                    <p class="text-5xl font-orbitron font-black">42<span class="text-lg text-gray-700 ml-1">/128</span></p>
+                    <i class="fas fa-users absolute -right-4 -bottom-4 text-8xl opacity-5 group-hover:scale-110 transition-transform"></i>
                 </div>
-                <div class="glass stat-card p-10 rounded-[50px] border-l-4 border-red-600">
-                    <p class="text-[10px] text-gray-500 font-black uppercase tracking-[3px] mb-2">Engellenen Hile</p>
-                    <p class="text-4xl font-orbitron font-black text-red-600">0</p>
+                <div class="glass p-10 rounded-[50px] border-b-4 border-red-600/30">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">Engellenen Hile</p>
+                    <p class="text-5xl font-orbitron font-black text-red-600">18</p>
                 </div>
-                <div class="glass stat-card p-10 rounded-[50px]">
-                    <p class="text-[10px] text-gray-500 font-black uppercase tracking-[3px] mb-2">Veri Gecikmesi</p>
-                    <p class="text-4xl font-orbitron font-black text-blue-400">14<span class="text-xs font-normal opacity-40 ml-1">ms</span></p>
+                <div class="glass p-10 rounded-[50px]">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-2 tracking-widest">API Latency</p>
+                    <p class="text-5xl font-orbitron font-black text-blue-400">14<span class="text-sm font-normal">ms</span></p>
                 </div>
             </div>
 
-            <div class="glass flex-1 rounded-[50px] p-10 overflow-y-auto">
-                <div class="flex justify-between items-center mb-8">
-                    <h3 class="font-orbitron text-xs text-blue-500 font-bold tracking-[5px] uppercase">Canlı Tespit Akışı</h3>
-                    <span class="text-[10px] px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">REAL-TIME</span>
-                </div>
-                <div id="logStream" class="space-y-4 opacity-20 text-center pt-32">
-                    <i class="fas fa-satellite-dish text-6xl mb-4 animate-pulse"></i>
-                    <p class="text-xs font-bold tracking-[5px] uppercase">Veri Akışı Bekleniyor</p>
+            <div class="glass flex-1 rounded-[50px] p-10 overflow-hidden flex flex-col">
+                <h3 class="font-orbitron text-xs text-blue-500 font-bold tracking-[5px] uppercase mb-8">Live Detection Feed</h3>
+                <div class="space-y-4 overflow-y-auto pr-2">
+                    <div class="flex items-center justify-between p-6 bg-white/[0.02] rounded-[30px] border border-white/5">
+                        <div class="flex items-center gap-6">
+                            <div class="w-12 h-12 rounded-2xl bg-red-600/10 flex items-center justify-center text-red-500"><i class="fas fa-shield-virus"></i></div>
+                            <div><p class="font-bold">ID: 42 | Mete</p><p class="text-[10px] text-gray-500 uppercase">Weapon Spawn Attempt (RPG)</p></div>
+                        </div>
+                        <span class="text-[10px] font-orbitron opacity-40">Just now</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="tab-players" class="tab-content h-full">
+            <div class="glass rounded-[50px] p-12 h-full flex flex-col">
+                <h2 class="text-4xl font-orbitron font-black mb-8 uppercase tracking-tighter">Aktif <span class="text-blue-600">Oyuncular</span></h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/5 p-6 rounded-3xl flex justify-between items-center border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center">1</div>
+                            <p class="font-bold">xSquze (Mete)</p>
+                        </div>
+                        <button class="text-xs font-bold text-red-500 bg-red-500/10 px-4 py-2 rounded-xl">BANLA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-bans" class="tab-content h-full">
             <div class="glass rounded-[50px] p-12 h-full">
-                <h2 class="text-4xl font-orbitron font-black mb-8">Oyuncu <span class="text-blue-600">Yönetimi</span></h2>
-                <div class="text-center py-20 opacity-30 border-2 border-dashed border-white/5 rounded-[40px]">
-                    <p>Henüz aktif bir sunucu bağlantısı yok.</p>
+                <h2 class="text-4xl font-orbitron font-black mb-8 uppercase tracking-tighter">Yasaklı <span class="text-red-600">Veritabanı</span></h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <tr class="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
+                            <th class="pb-4">Oyuncu</th>
+                            <th class="pb-4">Sebep</th>
+                            <th class="pb-4">Tarih</th>
+                        </tr>
+                        <tr class="border-b border-white/5">
+                            <td class="py-4 font-bold text-sm">Hileci_01</td>
+                            <td class="py-4 text-xs text-red-400 italic">Trigger Event Manipulation</td>
+                            <td class="py-4 text-xs opacity-50">18.04.2026</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
 
         <div id="tab-install" class="tab-content h-full">
             <div class="glass rounded-[50px] p-12 h-full flex flex-col items-center justify-center text-center">
-                <div class="w-24 h-24 bg-blue-600/10 rounded-full flex items-center justify-center mb-8 border border-blue-500/20">
+                <div class="w-24 h-24 bg-blue-600/10 rounded-full flex items-center justify-center mb-8 pulse-blue">
                     <i class="fas fa-cloud-arrow-down text-4xl text-blue-500"></i>
                 </div>
-                <h2 class="text-5xl font-orbitron font-black mb-4 uppercase">Sistemi Kur</h2>
-                <p class="text-gray-500 mb-12 max-w-xl">Noxa Cloud korumasını başlatmak için güncel dosyaları indirip sunucuna yükle. Lisansın bu işlemden sonra sunucunla eşleşecektir.</p>
+                <h2 class="text-5xl font-orbitron font-black mb-4 uppercase">NOXA CLOUD KURULUM</h2>
+                <p class="text-gray-500 mb-12 max-w-xl text-lg">Bu lisans aktif. Sunucunu korumaya başlamak için aşağıdaki butondan dosyaları indir ve kurulum rehberini takip et.</p>
                 
-                <div class="flex gap-4">
-                    <a href="https://drive.google.com/drive/folders/1hm9s77eLZVQvVrTbLIT9bg_ltRjAEoSP?usp=sharing" target="_blank" 
-                       class="bg-blue-600 hover:bg-blue-700 py-6 px-16 rounded-[30px] font-bold text-xl transition-all hover:scale-105 shadow-xl shadow-blue-600/20">
-                        <i class="fas fa-download mr-3"></i> NOXA_AC_V2.ZIP
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-settings" class="tab-content h-full">
-            <div class="glass rounded-[50px] p-12 h-full">
-                <h2 class="text-4xl font-orbitron font-black mb-8">Kritik <span class="text-blue-600">Ayarlar</span></h2>
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="bg-white/5 p-8 rounded-3xl border border-white/5">
-                        <h4 class="font-bold mb-4">Anti-Aimbot Sensitivity</h4>
-                        <input type="range" class="w-full accent-blue-600">
-                    </div>
-                    <div class="bg-white/5 p-8 rounded-3xl border border-white/5">
-                        <h4 class="font-bold mb-4">Auto-Ban System</h4>
-                        <div class="w-14 h-7 bg-blue-600 rounded-full relative"><div class="w-5 h-5 bg-white rounded-full absolute right-1 top-1"></div></div>
-                    </div>
-                </div>
+                <a href="https://drive.google.com/drive/folders/1hm9s77eLZVQvVrTbLIT9bg_ltRjAEoSP?usp=sharing" target="_blank" 
+                   class="bg-blue-600 hover:bg-blue-700 py-6 px-20 rounded-[35px] font-bold text-2xl transition-all hover:scale-105 shadow-2xl shadow-blue-600/20">
+                   <i class="fas fa-download mr-4"></i> ANTICHEAT İNDİR
+                </a>
             </div>
         </div>
 
     </main>
 
     <script>
-        function switchTab(tabName, btn) {
-            // Tüm içerikleri gizle
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        function switchTab(id, btn) {
+            // Tüm sekmeleri kapat
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            // Tüm butonları pasif yap
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
-            // Tüm butonların aktifliğini kaldır
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-
-            // Seçilen içeriği göster
-            const targetTab = document.getElementById('tab-' + tabName);
-            targetTab.classList.add('active');
-            
-            // Seçilen butonu aktif yap
+            // Seçileni aç
+            document.getElementById('tab-' + id).classList.add('active');
             btn.classList.add('active');
         }
     </script>
