@@ -3,100 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noxa Dashboard | Control Center</title>
+    <title>Noxa Anticheat | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
-        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #050505; }
-        body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; }
-        .neon-border { border: 1px solid var(--safir); box-shadow: 0 0 20px rgba(0, 102, 255, 0.2); }
-        .card-blur { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .btn-action { background: linear-gradient(90deg, #cc0000, #ff4b2b); transition: 0.3s; }
-        .btn-action:hover { box-shadow: 0 0 15px #ff4b2b; transform: scale(1.02); }
+        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #020202; --card: #0a0a0a; }
+        body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
+        .sidebar { background: #050505; border-right: 1px solid rgba(0, 102, 255, 0.1); }
+        .nav-item { transition: 0.3s; color: #666; }
+        .nav-item:hover, .nav-item.active { color: var(--neon); background: rgba(0, 102, 255, 0.05); border-left: 3px solid var(--safir); }
+        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.03); transition: 0.3s; }
+        .glass-card:hover { border-color: var(--safir); box-shadow: 0 0 20px rgba(0, 102, 255, 0.1); }
+        .status-online { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
     </style>
 </head>
-<body class="p-8">
+<body class="flex h-screen">
 
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-12 border-b border-white/10 pb-6">
-            <h1 class="font-orbitron text-3xl font-bold tracking-tighter">NOXA <span style="color:var(--neon)">DASHBOARD</span></h1>
-            <div class="text-right">
-                <p class="text-gray-500 text-xs uppercase">Server Status</p>
-                <p class="text-green-500 font-bold">CONNECTED</p>
+    <aside class="sidebar w-64 flex flex-col p-6">
+        <div class="font-orbitron text-2xl font-bold mb-10 tracking-tighter">
+            NOXA<span class="text-blue-500">AC</span>
+        </div>
+        
+        <nav class="flex-1 space-y-2">
+            <p class="text-[10px] text-gray-600 uppercase tracking-[3px] mb-4">Genel</p>
+            <a href="#" class="nav-item active flex items-center p-3 rounded-lg"><i class="fas fa-th-large mr-3"></i> Panel</a>
+            <a href="#" class="nav-item flex items-center p-3 rounded-lg"><i class="fas fa-download mr-3"></i> İndir</a>
+            
+            <p class="text-[10px] text-gray-600 uppercase tracking-[3px] mt-8 mb-4">Sunucu</p>
+            <div class="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 mb-4">
+                <p class="text-xs text-blue-400">Aktif Sunucu</p>
+                <p class="font-bold text-sm">Wia Roleplay</p>
+            </div>
+            <a href="#" class="nav-item flex items-center p-3 rounded-lg"><i class="fas fa-users mr-3"></i> Oyuncular</a>
+            <a href="#" class="nav-item flex items-center p-3 rounded-lg"><i class="fas fa-ban mr-3"></i> Yasaklılar</a>
+        </nav>
+
+        <div class="mt-auto p-4 glass-card rounded-xl flex items-center">
+            <div class="w-8 h-8 rounded-full bg-blue-600 mr-3"></div>
+            <div>
+                <p class="text-xs font-bold">xsquze</p>
+                <p class="text-[10px] text-blue-500">Premium Plan</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-10 overflow-y-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-orbitron">Hoş geldin, <span class="text-blue-500">Mete!</span></h1>
+                <p class="text-gray-500">Sunucu koruma durumunu buradan yönetebilirsin.</p>
+            </div>
+            <div class="flex space-x-4">
+                <button class="bg-red-500/10 text-red-500 px-6 py-2 rounded-lg border border-red-500/20 font-bold">LİSANS YOK</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-4 gap-6 mb-10">
+            <div class="glass-card p-6 rounded-2xl">
+                <p class="text-gray-500 text-xs uppercase mb-2">Sunucu Durumu</p>
+                <p class="status-online font-bold text-xl uppercase tracking-widest">Aktif</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <p class="text-gray-500 text-xs uppercase mb-2">Oyuncular</p>
+                <p class="font-bold text-2xl">42 / 128</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <p class="text-gray-500 text-xs uppercase mb-2">Toplam Ban</p>
+                <p class="font-bold text-2xl text-red-500">1,186</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <p class="text-gray-500 text-xs uppercase mb-2">Sürüm</p>
+                <p class="font-bold text-2xl">v2.3.2</p>
             </div>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="card-blur p-6 rounded-2xl neon-border">
-                <h3 class="font-orbitron mb-6 text-blue-400"><i class="fas fa-key mr-2"></i> LISANS OLUSTUR</h3>
-                <input type="text" id="owner" placeholder="Müşteri Adı" class="w-full bg-white/5 border border-white/10 p-3 rounded mb-4 focus:border-blue-500 outline-none">
-                <input type="text" id="ip" placeholder="Sunucu IP" class="w-full bg-white/5 border border-white/10 p-3 rounded mb-4 focus:border-blue-500 outline-none">
-                <button onclick="genLicense()" class="w-full bg-blue-600 py-3 rounded font-bold hover:bg-blue-500 transition">OLUSTUR</button>
-                <div id="licOutput" class="hidden mt-4 p-3 bg-black/40 text-xs text-blue-300 break-all border border-dashed border-blue-900"></div>
+        <div class="grid grid-cols-3 gap-8">
+            <div class="col-span-2 glass-card rounded-3xl p-8">
+                <h3 class="font-orbitron mb-6 flex items-center"><i class="fas fa-bolt text-yellow-500 mr-3"></i> Canlı Tespit Akışı</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border-l-4 border-red-500">
+                        <div class="flex items-center">
+                            <span class="bg-red-500 text-[10px] px-2 py-1 rounded mr-4">BANNED</span>
+                            <p class="text-sm font-bold">User#5173 <span class="text-gray-500 font-normal">NoClip Detected</span></p>
+                        </div>
+                        <span class="text-[10px] text-gray-600">11m ago</span>
+                    </div>
+                    </div>
             </div>
 
-            <div class="card-blur p-6 rounded-2xl neon-border md:col-span-2">
-                <h3 class="font-orbitron mb-6 text-red-500"><i class="fas fa-users mr-2"></i> CANLI YONETIM</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="text-gray-500 uppercase text-xs">
-                            <tr>
-                                <th class="pb-4">Oyuncu</th>
-                                <th class="pb-4">ID</th>
-                                <th class="pb-4">Durum</th>
-                                <th class="pb-4 text-right">Islem</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm" id="playerList">
-                            <tr class="border-t border-white/5">
-                                <td class="py-4">Mete (xSquze)</td>
-                                <td class="py-4 text-gray-400">#1</td>
-                                <td class="py-4"><span class="text-green-400">Online</span></td>
-                                <td class="py-4 text-right">
-                                    <button onclick="sendAction('ban', 'Mete')" class="btn-action px-4 py-1 rounded text-xs font-bold">BANLA</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="glass-card rounded-3xl p-8">
+                <h3 class="font-orbitron mb-6 text-blue-500">Hızlı İşlemler</h3>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold mb-4 flex items-center justify-center transition">
+                    <i class="fas fa-download mr-3"></i> NOXA KAYNAĞI İNDİR
+                </button>
+                <div class="mt-6 p-4 border border-dashed border-white/10 rounded-xl">
+                    <p class="text-[10px] text-gray-500 mb-2 uppercase">Lisans Anahtarı Gir</p>
+                    <input type="text" placeholder="NOXA-XXXX-XXXX" class="w-full bg-black border border-white/10 p-3 rounded-lg text-sm mb-4 outline-none focus:border-blue-500">
+                    <button class="w-full bg-white text-black py-2 rounded-lg font-bold text-sm">AKTİFLEŞTİR</button>
                 </div>
             </div>
         </div>
-
-        <div class="mt-8 card-blur p-6 rounded-2xl border border-white/5">
-            <h3 class="font-orbitron mb-4 text-gray-400 text-sm">BANLI LISTESI</h3>
-            <div id="banList" class="flex flex-wrap gap-4">
-                <div class="bg-white/5 px-4 py-2 rounded-full border border-red-900/30 flex items-center">
-                    <span class="text-sm mr-3">Hileci_123</span>
-                    <button onclick="sendAction('unban', 'Hileci_123')" class="text-red-500 hover:text-white"><i class="fas fa-times-circle"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Buraya kendi Webhook linkini koyarsan siteden bastığın buton Discord'una gelir!
-        const webhook = "https://discord.com/api/webhooks/1494071473843736717/_JtdFv6o0I-JbqoN9jZnDg-fDvGh3bMlLt3N61KbF-XPtSs68SH58mFQPY1MmF50v-DAY";
-
-        function sendAction(type, target) {
-            fetch(webhook, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: `🛡️ **NOXA PANEL ISLEM**\n**Tip:** ${type.toUpperCase()}\n**Hedef:** ${target}\n**Zaman:** ${new Date().toLocaleString()}`
-                })
-            });
-            alert(target + " için " + type + " işlemi gönderildi!");
-        }
-
-        function genLicense() {
-            const owner = document.getElementById('owner').value;
-            const ip = document.getElementById('ip').value;
-            const key = "NOXA-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-            const output = `"${key}": { "owner": "${owner}", "active": true, "ip": "${ip}" }`;
-            document.getElementById('licOutput').innerText = output;
-            document.getElementById('licOutput').classList.remove('hidden');
-        }
-    </script>
+    </main>
 </body>
 </html>
