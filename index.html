@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noxa Anticheat | Professional Protection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --dark: #0a0a0a;
+            --card: #151515;
+            --text: #ffffff;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 80%;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #003a47 0%, #0a0a0a 70%);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 60px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--primary);
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #aaa;
+            max-width: 600px;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            background: var(--primary);
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 30px;
+            transition: 0.3s;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 10%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #222;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+        }
+
+        .card i {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        /* License Management (Admin Part) */
+        .admin-section {
+            padding: 100px 10%;
+            background: #0f0f0f;
+            text-align: center;
+        }
+
+        .admin-box {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 1px dashed var(--primary);
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #222;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .key-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: #000;
+            border-left: 5px solid var(--primary);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Noxa Anticheat</div>
+        <div>
+            <a href="#" style="color:white; text-decoration:none; margin-left:20px;">Ana Sayfa</a>
+            <a href="#admin" style="color:white; text-decoration:none; margin-left:20px;">Lisans Yönetimi</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>NOXA ANTICHEAT</h1>
+        <p>FiveM sunucunuz için en gelişmiş, dinamik ve aşılması imkansız koruma sistemi. Hilecilere veda edin.</p>
+        <a href="#admin" class="btn">LISANS OLUSTUR</a>
+    </section>
+
+    <section class="features">
+        <div class="card">
+            <i class="fas fa-shield-halved"></i>
+            <h3>Gelişmiş Koruma</h3>
+            <p>Eulen, Skript ve Executor hilelerine karşı %100 tam koruma sağlar.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-bolt"></i>
+            <h3>Yüksek Performans</h3>
+            <p>0.01ms resmon değeri ile sunucunuzda gram kasma yapmaz.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-code"></i>
+            <h3>Özel Lisans Paneli</h3>
+            <p>Tüm keylerinizi tek bir merkezden yönetin ve IP kilidi koyun.</p>
+        </div>
+    </section>
+
+    <section id="admin" class="admin-section">
+        <h2>🛡️ Yönetim Paneli</h2>
+        <div class="admin-box">
+            <input type="text" id="owner" placeholder="Müşteri Adı">
+            <input type="text" id="ip" placeholder="Sunucu IP Adresi">
+            <button class="btn" onclick="createLicense()" style="cursor:pointer; border:none;">KEY ÜRET</button>
+            
+            <div id="result" class="key-display">
+                <p>Oluşturulan JSON:</p>
+                <code id="keyCode" style="color: var(--primary); word-break: break-all;"></code>
+                <p style="font-size: 12px; color: #777; margin-top: 10px;">Bunu GitHub'daki licenses.json dosyasına ekle.</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function createLicense() {
+            const owner = document.getElementById('owner').value;
+            const ip = document.getElementById('ip').value;
+            
+            if(!owner || !ip) {
+                alert("Lütfen tüm alanları doldur!");
+                return;
+            }
+
+            const key = "NOXA-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+            
+            const jsonFormat = `"${key}": {"owner": "${owner}", "active": true, "ip": "${ip}"}`;
+            
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('keyCode').innerText = jsonFormat;
+        }
+    </script>
+
+</body>
+</html>
