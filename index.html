@@ -2,123 +2,77 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Noxa Cloud | Live Intelligence</title>
+    <title>Noxa Cloud | Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
-        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #020202; }
-        
+        :root { --safir: #0066ff; --dark: #020202; }
         body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; }
-
-        /* Hareketli Parçacık Arka Planı Efekti */
-        .scanline { width: 100%; height: 100px; background: linear-gradient(0deg, rgba(0, 102, 255, 0) 0%, rgba(0, 102, 255, 0.1) 50%, rgba(0, 102, 255, 0) 100%); position: absolute; bottom: 100%; animation: scan 4s linear infinite; z-index: 1; pointer-events: none; }
-        @keyframes scan { from { bottom: 100%; } to { bottom: -100%; } }
-
-        .glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(25px); border: 1px solid rgba(0, 102, 255, 0.15); box-shadow: 0 0 40px rgba(0,0,0,0.5); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .glass:hover { border-color: var(--safir); transform: translateY(-5px); box-shadow: 0 10px 50px rgba(0, 102, 255, 0.1); }
-        
-        .stat-value { font-family: 'Orbitron', sans-serif; font-weight: 900; background: linear-gradient(180deg, #fff 0%, #0066ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(0, 102, 255, 0.3)); }
-        
-        /* Tespit Akışı Animasyonu */
-        .log-entry { animation: slideIn 0.5s ease-out forwards; border-left: 2px solid transparent; }
-        .log-entry:hover { border-left-color: var(--safir); background: linear-gradient(90deg, rgba(0, 102, 255, 0.05) 0%, transparent 100%); }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(25px); border: 1px solid rgba(0, 102, 255, 0.15); }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out forwards; }
+        .active-view { display: block; }
+        .active-btn { color: var(--safir); background: rgba(0, 102, 255, 0.1); border-right: 3px solid var(--safir); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center p-6 relative">
-    <div class="scanline"></div>
+<body class="h-screen flex p-6 gap-6">
 
-    <div class="w-full h-full max-w-[1600px] flex gap-6 z-10">
-        
-        <aside class="w-80 glass rounded-[45px] p-8 flex flex-col">
-            <div class="mb-16">
-                <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-600/40">
-                    <i class="fas fa-shield-halved text-3xl"></i>
-                </div>
-                <h1 class="font-orbitron text-3xl font-black">NOXA<span class="text-blue-500">.</span></h1>
-                <p class="text-[10px] text-blue-400 tracking-[5px] uppercase font-bold">Cloud Security</p>
-            </div>
+    <aside class="w-80 glass rounded-[40px] p-8 flex flex-col">
+        <div class="mb-12"><h1 class="font-orbitron text-2xl font-black">NOXA <span class="text-blue-500">AC</span></h1></div>
+        <nav class="flex-1 space-y-4">
+            <button onclick="switchTab('dash')" id="btn-dash" class="w-full flex items-center p-4 rounded-2xl active-btn transition-all"><i class="fas fa-chart-line mr-4"></i> MONITOR</button>
+            <button onclick="switchTab('players')" id="btn-players" class="w-full flex items-center p-4 rounded-2xl text-gray-500 hover:text-white transition-all"><i class="fas fa-users mr-4"></i> PLAYERS</button>
+            <button onclick="switchTab('setup')" id="btn-setup" class="w-full flex items-center p-4 rounded-2xl text-gray-500 hover:text-white transition-all"><i class="fas fa-download mr-4"></i> INSTALL</button>
+        </nav>
+        <div class="mt-auto glass p-6 rounded-3xl bg-white/[0.02] border-none">
+            <p class="text-[10px] text-gray-500 uppercase mb-1">Status</p>
+            <p id="srvName" class="font-bold text-blue-500">SUNUCU BEKLENİYOR...</p>
+        </div>
+    </aside>
 
-            <nav class="space-y-4 flex-1">
-                <a href="#" class="flex items-center p-4 rounded-2xl bg-blue-600/10 text-blue-400 border border-blue-500/20"><i class="fas fa-chart-line mr-4"></i> MONITOR</a>
-                <a href="#" class="flex items-center p-4 rounded-2xl text-gray-500 hover:text-white transition-all"><i class="fas fa-users mr-4"></i> PLAYERS</a>
-                <a href="#" class="flex items-center p-4 rounded-2xl text-gray-500 hover:text-white transition-all"><i class="fas fa-cog mr-4"></i> SETTINGS</a>
-            </nav>
-
-            <div class="mt-auto glass p-6 rounded-[30px] border-none bg-white/[0.03]">
-                <p class="text-[10px] text-gray-500 mb-2 uppercase tracking-widest">Linked Server</p>
-                <p id="serverName" class="font-bold text-sm text-blue-500">SUNUCU BEKLENİYOR...</p>
-                <div class="flex items-center mt-3 text-[10px] text-green-500 font-bold uppercase">
-                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span> SYSTEM READY
-                </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 flex flex-col gap-6">
-            
+    <main class="flex-1 overflow-hidden">
+        <div id="view-dash" class="tab-content active-view h-full flex flex-col gap-6">
             <div class="grid grid-cols-3 gap-6">
-                <div class="glass p-10 rounded-[50px] relative overflow-hidden">
-                    <p class="text-xs text-gray-500 font-bold uppercase mb-4 tracking-widest">Canlı Oyuncu</p>
-                    <p id="playerCount" class="stat-value text-5xl">--</p>
-                    <i class="fas fa-users-viewfinder absolute -right-4 -bottom-4 text-8xl opacity-5"></i>
-                </div>
-                <div class="glass p-10 rounded-[50px] border-b-4 border-red-600/30">
-                    <p class="text-xs text-gray-500 font-bold uppercase mb-4 tracking-widest">Engellenen Hile</p>
-                    <p id="banCount" class="stat-value text-5xl">0</p>
-                </div>
-                <div class="glass p-10 rounded-[50px]">
-                    <p class="text-xs text-gray-500 font-bold uppercase mb-4 tracking-widest">Cloud Latency</p>
-                    <p id="pingTime" class="stat-value text-5xl">--<span class="text-sm font-normal">ms</span></p>
+                <div class="glass p-10 rounded-[40px]"><p class="text-xs text-gray-500 uppercase mb-2">OYUNCU</p><p id="pCount" class="text-4xl font-orbitron font-black">--</p></div>
+                <div class="glass p-10 rounded-[40px]"><p class="text-xs text-gray-500 uppercase mb-2">BANLAR</p><p class="text-4xl font-orbitron font-black text-red-600">0</p></div>
+                <div class="glass p-10 rounded-[40px]"><p class="text-xs text-gray-500 uppercase mb-2">PING</p><p class="text-4xl font-orbitron font-black text-blue-400">12ms</p></div>
+            </div>
+            <div class="glass flex-1 rounded-[40px] p-8 overflow-y-auto">
+                <h3 class="font-orbitron text-xs text-blue-500 tracking-[4px] mb-6 uppercase">Live Detection Feed</h3>
+                <div id="logs" class="space-y-4 opacity-20 text-center pt-20">
+                    <i class="fas fa-satellite-dish text-5xl mb-4"></i>
+                    <p class="text-xs font-bold tracking-[4px]">VERİ AKIŞI BEKLENİYOR</p>
                 </div>
             </div>
+        </div>
 
-            <div class="glass flex-1 rounded-[50px] p-10 flex flex-col">
-                <div class="flex justify-between items-center mb-10">
-                    <h3 class="font-orbitron font-bold text-sm text-blue-500 tracking-[4px]">LIVE DETECTION FEED</h3>
-                    <div class="flex gap-2">
-                        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span>
-                        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
-                    </div>
-                </div>
-                
-                <div id="logStream" class="flex-1 overflow-y-auto space-y-4 pr-4">
-                    <div class="text-center py-20 opacity-20">
-                        <i class="fas fa-satellite-dish text-6xl mb-4"></i>
-                        <p class="text-xs font-bold tracking-[5px]">VERİ AKIŞI BEKLENİYOR</p>
-                    </div>
-                </div>
+        <div id="view-players" class="tab-content h-full">
+            <div class="glass rounded-[40px] p-10 h-full">
+                <h2 class="text-3xl font-orbitron font-black mb-6">Sunucu <span class="text-blue-500">Listesi</span></h2>
+                <p class="text-gray-500">Şu an aktif oyuncu verisi bulunmuyor.</p>
             </div>
-        </main>
-    </div>
+        </div>
+
+        <div id="view-setup" class="tab-content h-full">
+            <div class="glass rounded-[40px] p-12 text-center h-full flex flex-col justify-center">
+                <i class="fas fa-cloud-arrow-down text-6xl text-blue-500 mb-8"></i>
+                <h2 class="text-4xl font-orbitron font-black mb-4 uppercase">Dosyaları İndir</h2>
+                <p class="text-gray-500 mb-10 max-w-lg mx-auto">Sunucuna Noxa AC kurmak için dosyaları indir, 'resources' klasörüne at ve server.cfg dosyana 'ensure NoxaAnticheat' ekle.</p>
+                <a href="https://drive.google.com/drive/folders/1hm9s77eLZVQvVrTbLIT9bg_ltRjAEoSP?usp=sharing" target="_blank" 
+                   class="bg-blue-600 hover:bg-blue-700 py-6 px-12 rounded-3xl font-bold text-xl inline-block transition-transform hover:scale-105">
+                   <i class="fas fa-download mr-3"></i> ANTICHEAT İNDİR (.ZIP)
+                </a>
+            </div>
+        </div>
+    </main>
 
     <script>
-        // GERÇEK VERİ BAĞLANTISI (Örnek Fonksiyon)
-        function updateDashboard(data) {
-            document.getElementById('serverName').innerText = data.serverName.toUpperCase();
-            document.getElementById('playerCount').innerText = data.players;
-            document.getElementById('banCount').innerText = data.totalBans;
-            document.getElementById('pingTime').innerText = data.ping;
-
-            if (data.newDetection) {
-                const log = `
-                    <div class="log-entry flex items-center justify-between p-6 bg-white/[0.02] rounded-[25px] border border-white/5">
-                        <div class="flex items-center gap-6">
-                            <div class="w-12 h-12 rounded-2xl bg-red-600/10 flex items-center justify-center text-red-500 border border-red-600/20">
-                                <i class="fas fa-shield-virus"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-lg">${data.newDetection.user}</p>
-                                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">${data.newDetection.reason}</p>
-                            </div>
-                        </div>
-                        <button class="bg-blue-600/10 text-blue-500 px-6 py-2 rounded-xl text-xs font-bold border border-blue-500/20 hover:bg-blue-600 hover:text-white transition-all">DETAY</button>
-                    </div>
-                `;
-                const stream = document.getElementById('logStream');
-                stream.innerHTML = log + stream.innerHTML;
-            }
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-view'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-btn', 'text-white'));
+            document.getElementById('view-' + tabId).classList.add('active-view');
+            document.getElementById('btn-' + tabId).classList.add('active-btn');
         }
     </script>
 </body>
