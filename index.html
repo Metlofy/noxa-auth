@@ -2,77 +2,160 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Noxa Cloud | Management</title>
+    <title>Noxa Cloud | Management Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
-        :root { --safir: #0066ff; --dark: #020202; }
-        body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; }
-        .glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(25px); border: 1px solid rgba(0, 102, 255, 0.15); }
-        .tab-content { display: none; animation: fadeIn 0.4s ease-out forwards; }
-        .active-view { display: block; }
-        .active-btn { color: var(--safir); background: rgba(0, 102, 255, 0.1); border-right: 3px solid var(--safir); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #020202; --card: rgba(10, 10, 10, 0.85); }
+        
+        body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; margin: 0; }
+        
+        /* Arka Plan Grid Efekti */
+        body::before {
+            content: ''; position: absolute; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 102, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1;
+        }
+
+        .glass { background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(0, 102, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        
+        /* Sekme Animasyonları */
+        .tab-content { display: none; opacity: 0; transform: translateY(15px); transition: all 0.4s ease-out; }
+        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        .nav-btn { position: relative; transition: all 0.3s; color: #666; }
+        .nav-btn.active { color: white; background: rgba(0, 102, 255, 0.1); border-right: 3px solid var(--safir); }
+        .nav-btn:hover:not(.active) { color: #aaa; background: rgba(255,255,255,0.02); }
+
+        .stat-card { transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--safir); }
     </style>
 </head>
 <body class="h-screen flex p-6 gap-6">
 
-    <aside class="w-80 glass rounded-[40px] p-8 flex flex-col">
-        <div class="mb-12"><h1 class="font-orbitron text-2xl font-black">NOXA <span class="text-blue-500">AC</span></h1></div>
-        <nav class="flex-1 space-y-4">
-            <button onclick="switchTab('dash')" id="btn-dash" class="w-full flex items-center p-4 rounded-2xl active-btn transition-all"><i class="fas fa-chart-line mr-4"></i> MONITOR</button>
-            <button onclick="switchTab('players')" id="btn-players" class="w-full flex items-center p-4 rounded-2xl text-gray-500 hover:text-white transition-all"><i class="fas fa-users mr-4"></i> PLAYERS</button>
-            <button onclick="switchTab('setup')" id="btn-setup" class="w-full flex items-center p-4 rounded-2xl text-gray-500 hover:text-white transition-all"><i class="fas fa-download mr-4"></i> INSTALL</button>
+    <aside class="w-80 glass rounded-[45px] p-8 flex flex-col">
+        <div class="mb-12 px-2">
+            <h1 class="font-orbitron text-2xl font-black tracking-tighter">NOXA <span class="text-blue-500 italic">CLOUD</span></h1>
+            <div class="h-1 w-12 bg-blue-600 mt-1 rounded-full"></div>
+        </div>
+
+        <nav class="flex-1 space-y-3">
+            <button onclick="switchTab('dash', this)" class="nav-btn active w-full flex items-center p-4 rounded-2xl">
+                <i class="fas fa-chart-line mr-4 w-5"></i> Dashboard
+            </button>
+            <button onclick="switchTab('players', this)" class="nav-btn w-full flex items-center p-4 rounded-2xl">
+                <i class="fas fa-users mr-4 w-5"></i> Sunucu / Oyuncu
+            </button>
+            <button onclick="switchTab('install', this)" class="nav-btn w-full flex items-center p-4 rounded-2xl text-blue-400">
+                <i class="fas fa-cloud-arrow-down mr-4 w-5"></i> Kurulum & İndir
+            </button>
+            <button onclick="switchTab('settings', this)" class="nav-btn w-full flex items-center p-4 rounded-2xl">
+                <i class="fas fa-shield-halved mr-4 w-5"></i> AC Ayarları
+            </button>
         </nav>
-        <div class="mt-auto glass p-6 rounded-3xl bg-white/[0.02] border-none">
-            <p class="text-[10px] text-gray-500 uppercase mb-1">Status</p>
-            <p id="srvName" class="font-bold text-blue-500">SUNUCU BEKLENİYOR...</p>
+
+        <div class="mt-auto glass p-6 rounded-[30px] border-none bg-white/[0.03]">
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Status</p>
+            <p id="srvStatus" class="font-bold text-sm text-blue-500">SUNUCU BEKLENİYOR...</p>
+            <div class="flex items-center mt-2 text-[10px] text-green-500 font-bold">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span> SYSTEM ONLINE
+            </div>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-hidden">
-        <div id="view-dash" class="tab-content active-view h-full flex flex-col gap-6">
+    <main class="flex-1 overflow-hidden relative">
+        
+        <div id="tab-dash" class="tab-content active h-full flex flex-col gap-6">
             <div class="grid grid-cols-3 gap-6">
-                <div class="glass p-10 rounded-[40px]"><p class="text-xs text-gray-500 uppercase mb-2">OYUNCU</p><p id="pCount" class="text-4xl font-orbitron font-black">--</p></div>
-                <div class="glass p-10 rounded-[40px]"><p class="text-xs text-gray-500 uppercase mb-2">BANLAR</p><p class="text-4xl font-orbitron font-black text-red-600">0</p></div>
-                <div class="glass p-10 rounded-[40px]"><p class="text-xs text-gray-500 uppercase mb-2">PING</p><p class="text-4xl font-orbitron font-black text-blue-400">12ms</p></div>
+                <div class="glass stat-card p-10 rounded-[50px]">
+                    <p class="text-[10px] text-gray-500 font-black uppercase tracking-[3px] mb-2">Aktif Oyuncu</p>
+                    <p class="text-4xl font-orbitron font-black text-white">--</p>
+                </div>
+                <div class="glass stat-card p-10 rounded-[50px] border-l-4 border-red-600">
+                    <p class="text-[10px] text-gray-500 font-black uppercase tracking-[3px] mb-2">Engellenen Hile</p>
+                    <p class="text-4xl font-orbitron font-black text-red-600">0</p>
+                </div>
+                <div class="glass stat-card p-10 rounded-[50px]">
+                    <p class="text-[10px] text-gray-500 font-black uppercase tracking-[3px] mb-2">Veri Gecikmesi</p>
+                    <p class="text-4xl font-orbitron font-black text-blue-400">14<span class="text-xs font-normal opacity-40 ml-1">ms</span></p>
+                </div>
             </div>
-            <div class="glass flex-1 rounded-[40px] p-8 overflow-y-auto">
-                <h3 class="font-orbitron text-xs text-blue-500 tracking-[4px] mb-6 uppercase">Live Detection Feed</h3>
-                <div id="logs" class="space-y-4 opacity-20 text-center pt-20">
-                    <i class="fas fa-satellite-dish text-5xl mb-4"></i>
-                    <p class="text-xs font-bold tracking-[4px]">VERİ AKIŞI BEKLENİYOR</p>
+
+            <div class="glass flex-1 rounded-[50px] p-10 overflow-y-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-orbitron text-xs text-blue-500 font-bold tracking-[5px] uppercase">Canlı Tespit Akışı</h3>
+                    <span class="text-[10px] px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">REAL-TIME</span>
+                </div>
+                <div id="logStream" class="space-y-4 opacity-20 text-center pt-32">
+                    <i class="fas fa-satellite-dish text-6xl mb-4 animate-pulse"></i>
+                    <p class="text-xs font-bold tracking-[5px] uppercase">Veri Akışı Bekleniyor</p>
                 </div>
             </div>
         </div>
 
-        <div id="view-players" class="tab-content h-full">
-            <div class="glass rounded-[40px] p-10 h-full">
-                <h2 class="text-3xl font-orbitron font-black mb-6">Sunucu <span class="text-blue-500">Listesi</span></h2>
-                <p class="text-gray-500">Şu an aktif oyuncu verisi bulunmuyor.</p>
+        <div id="tab-players" class="tab-content h-full">
+            <div class="glass rounded-[50px] p-12 h-full">
+                <h2 class="text-4xl font-orbitron font-black mb-8">Oyuncu <span class="text-blue-600">Yönetimi</span></h2>
+                <div class="text-center py-20 opacity-30 border-2 border-dashed border-white/5 rounded-[40px]">
+                    <p>Henüz aktif bir sunucu bağlantısı yok.</p>
+                </div>
             </div>
         </div>
 
-        <div id="view-setup" class="tab-content h-full">
-            <div class="glass rounded-[40px] p-12 text-center h-full flex flex-col justify-center">
-                <i class="fas fa-cloud-arrow-down text-6xl text-blue-500 mb-8"></i>
-                <h2 class="text-4xl font-orbitron font-black mb-4 uppercase">Dosyaları İndir</h2>
-                <p class="text-gray-500 mb-10 max-w-lg mx-auto">Sunucuna Noxa AC kurmak için dosyaları indir, 'resources' klasörüne at ve server.cfg dosyana 'ensure NoxaAnticheat' ekle.</p>
-                <a href="https://drive.google.com/drive/folders/1hm9s77eLZVQvVrTbLIT9bg_ltRjAEoSP?usp=sharing" target="_blank" 
-                   class="bg-blue-600 hover:bg-blue-700 py-6 px-12 rounded-3xl font-bold text-xl inline-block transition-transform hover:scale-105">
-                   <i class="fas fa-download mr-3"></i> ANTICHEAT İNDİR (.ZIP)
-                </a>
+        <div id="tab-install" class="tab-content h-full">
+            <div class="glass rounded-[50px] p-12 h-full flex flex-col items-center justify-center text-center">
+                <div class="w-24 h-24 bg-blue-600/10 rounded-full flex items-center justify-center mb-8 border border-blue-500/20">
+                    <i class="fas fa-cloud-arrow-down text-4xl text-blue-500"></i>
+                </div>
+                <h2 class="text-5xl font-orbitron font-black mb-4 uppercase">Sistemi Kur</h2>
+                <p class="text-gray-500 mb-12 max-w-xl">Noxa Cloud korumasını başlatmak için güncel dosyaları indirip sunucuna yükle. Lisansın bu işlemden sonra sunucunla eşleşecektir.</p>
+                
+                <div class="flex gap-4">
+                    <a href="https://drive.google.com/drive/folders/1hm9s77eLZVQvVrTbLIT9bg_ltRjAEoSP?usp=sharing" target="_blank" 
+                       class="bg-blue-600 hover:bg-blue-700 py-6 px-16 rounded-[30px] font-bold text-xl transition-all hover:scale-105 shadow-xl shadow-blue-600/20">
+                        <i class="fas fa-download mr-3"></i> NOXA_AC_V2.ZIP
+                    </a>
+                </div>
             </div>
         </div>
+
+        <div id="tab-settings" class="tab-content h-full">
+            <div class="glass rounded-[50px] p-12 h-full">
+                <h2 class="text-4xl font-orbitron font-black mb-8">Kritik <span class="text-blue-600">Ayarlar</span></h2>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white/5 p-8 rounded-3xl border border-white/5">
+                        <h4 class="font-bold mb-4">Anti-Aimbot Sensitivity</h4>
+                        <input type="range" class="w-full accent-blue-600">
+                    </div>
+                    <div class="bg-white/5 p-8 rounded-3xl border border-white/5">
+                        <h4 class="font-bold mb-4">Auto-Ban System</h4>
+                        <div class="w-14 h-7 bg-blue-600 rounded-full relative"><div class="w-5 h-5 bg-white rounded-full absolute right-1 top-1"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-view'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-btn', 'text-white'));
-            document.getElementById('view-' + tabId).classList.add('active-view');
-            document.getElementById('btn-' + tabId).classList.add('active-btn');
+        function switchTab(tabName, btn) {
+            // Tüm içerikleri gizle
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Tüm butonların aktifliğini kaldır
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+
+            // Seçilen içeriği göster
+            const targetTab = document.getElementById('tab-' + tabName);
+            targetTab.classList.add('active');
+            
+            // Seçilen butonu aktif yap
+            btn.classList.add('active');
         }
     </script>
 </body>
