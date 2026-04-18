@@ -3,107 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noxa Anticheat | Dashboard</title>
+    <title>Noxa AC | Cloud Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap');
-        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #020202; --card: #0a0a0a; }
-        body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
-        .sidebar { background: #050505; border-right: 1px solid rgba(0, 102, 255, 0.1); }
-        .nav-item { transition: 0.3s; color: #666; }
-        .nav-item:hover, .nav-item.active { color: var(--neon); background: rgba(0, 102, 255, 0.05); border-left: 3px solid var(--safir); }
-        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.03); transition: 0.3s; }
-        .glass-card:hover { border-color: var(--safir); box-shadow: 0 0 20px rgba(0, 102, 255, 0.1); }
-        .status-online { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #020202; }
+        body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; }
+        .login-screen { background: radial-gradient(circle at center, #001a33 0%, #020202 100%); }
+        .sidebar { background: #050505; border-right: 1px solid rgba(0, 102, 255, 0.1); width: 280px; transition: 0.3s; }
+        .glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .active-tab { color: var(--neon); background: rgba(0, 102, 255, 0.05); border-left: 4px solid var(--safir); }
+        .hidden { display: none; }
     </style>
 </head>
-<body class="flex h-screen">
+<body class="h-screen overflow-hidden">
 
-    <aside class="sidebar w-64 flex flex-col p-6">
-        <div class="font-orbitron text-2xl font-bold mb-10 tracking-tighter">
-            NOXA<span class="text-blue-500">AC</span>
+    <div id="loginSection" class="login-screen fixed inset-0 z-50 flex items-center justify-center p-6">
+        <div class="glass max-w-md w-full p-10 rounded-3xl text-center border-blue-500/30 border">
+            <h1 class="font-orbitron text-4xl font-bold mb-2 tracking-widest text-white">NOXA <span class="text-blue-500 text-sm italic">v2.3.2</span></h1>
+            <p class="text-gray-500 mb-8 uppercase text-xs tracking-[4px]">Cloud Authentication</p>
+            <input type="text" id="licenseInput" placeholder="LISANS ANAHTARINI GIRIN" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl text-center font-orbitron text-blue-400 tracking-widest outline-none focus:border-blue-500 mb-4">
+            <button onclick="checkAuth()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold transition-all transform hover:scale-[1.02]">SISTEME GIRIS YAP</button>
+            <p id="errorMsg" class="text-red-500 text-xs mt-4 opacity-0 transition">Lisans dogrulanamadı!</p>
         </div>
-        
-        <nav class="flex-1 space-y-2">
-            <p class="text-[10px] text-gray-600 uppercase tracking-[3px] mb-4">Genel</p>
-            <a href="#" class="nav-item active flex items-center p-3 rounded-lg"><i class="fas fa-th-large mr-3"></i> Panel</a>
-            <a href="#" class="nav-item flex items-center p-3 rounded-lg"><i class="fas fa-download mr-3"></i> İndir</a>
+    </div>
+
+    <div id="mainDashboard" class="flex h-full hidden">
+        <aside class="sidebar p-6 flex flex-col">
+            <div class="font-orbitron text-2xl font-bold mb-12 text-blue-500 tracking-tighter">NOXA AC</div>
             
-            <p class="text-[10px] text-gray-600 uppercase tracking-[3px] mt-8 mb-4">Sunucu</p>
-            <div class="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 mb-4">
-                <p class="text-xs text-blue-400">Aktif Sunucu</p>
-                <p class="font-bold text-sm">Wia Roleplay</p>
-            </div>
-            <a href="#" class="nav-item flex items-center p-3 rounded-lg"><i class="fas fa-users mr-3"></i> Oyuncular</a>
-            <a href="#" class="nav-item flex items-center p-3 rounded-lg"><i class="fas fa-ban mr-3"></i> Yasaklılar</a>
-        </nav>
+            <nav class="flex-1 space-y-1">
+                <button onclick="showTab('home')" class="nav-btn active-tab w-full flex items-center p-4 rounded-xl transition"><i class="fas fa-th-large mr-4"></i> Genel Bakış</button>
+                <button onclick="showTab('players')" class="nav-btn w-full flex items-center p-4 rounded-xl transition text-gray-500 hover:text-white"><i class="fas fa-users mr-4"></i> Oyuncular</button>
+                <button onclick="showTab('bans')" class="nav-btn w-full flex items-center p-4 rounded-xl transition text-gray-500 hover:text-white"><i class="fas fa-shield-alt mr-4"></i> Yasaklılar</button>
+                <button onclick="downloadResource()" class="w-full flex items-center p-4 rounded-xl transition text-blue-400 hover:bg-blue-500/10 mt-10"><i class="fas fa-cloud-download-alt mr-4"></i> Kaynağı İndir</button>
+            </nav>
 
-        <div class="mt-auto p-4 glass-card rounded-xl flex items-center">
-            <div class="w-8 h-8 rounded-full bg-blue-600 mr-3"></div>
-            <div>
-                <p class="text-xs font-bold">xsquze</p>
-                <p class="text-[10px] text-blue-500">Premium Plan</p>
-            </div>
-        </div>
-    </aside>
-
-    <main class="flex-1 p-10 overflow-y-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-orbitron">Hoş geldin, <span class="text-blue-500">Mete!</span></h1>
-                <p class="text-gray-500">Sunucu koruma durumunu buradan yönetebilirsin.</p>
-            </div>
-            <div class="flex space-x-4">
-                <button class="bg-red-500/10 text-red-500 px-6 py-2 rounded-lg border border-red-500/20 font-bold">LİSANS YOK</button>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-4 gap-6 mb-10">
-            <div class="glass-card p-6 rounded-2xl">
-                <p class="text-gray-500 text-xs uppercase mb-2">Sunucu Durumu</p>
-                <p class="status-online font-bold text-xl uppercase tracking-widest">Aktif</p>
-            </div>
-            <div class="glass-card p-6 rounded-2xl">
-                <p class="text-gray-500 text-xs uppercase mb-2">Oyuncular</p>
-                <p class="font-bold text-2xl">42 / 128</p>
-            </div>
-            <div class="glass-card p-6 rounded-2xl">
-                <p class="text-gray-500 text-xs uppercase mb-2">Toplam Ban</p>
-                <p class="font-bold text-2xl text-red-500">1,186</p>
-            </div>
-            <div class="glass-card p-6 rounded-2xl">
-                <p class="text-gray-500 text-xs uppercase mb-2">Sürüm</p>
-                <p class="font-bold text-2xl">v2.3.2</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-8">
-            <div class="col-span-2 glass-card rounded-3xl p-8">
-                <h3 class="font-orbitron mb-6 flex items-center"><i class="fas fa-bolt text-yellow-500 mr-3"></i> Canlı Tespit Akışı</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border-l-4 border-red-500">
-                        <div class="flex items-center">
-                            <span class="bg-red-500 text-[10px] px-2 py-1 rounded mr-4">BANNED</span>
-                            <p class="text-sm font-bold">User#5173 <span class="text-gray-500 font-normal">NoClip Detected</span></p>
-                        </div>
-                        <span class="text-[10px] text-gray-600">11m ago</span>
-                    </div>
-                    </div>
-            </div>
-
-            <div class="glass-card rounded-3xl p-8">
-                <h3 class="font-orbitron mb-6 text-blue-500">Hızlı İşlemler</h3>
-                <button class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold mb-4 flex items-center justify-center transition">
-                    <i class="fas fa-download mr-3"></i> NOXA KAYNAĞI İNDİR
-                </button>
-                <div class="mt-6 p-4 border border-dashed border-white/10 rounded-xl">
-                    <p class="text-[10px] text-gray-500 mb-2 uppercase">Lisans Anahtarı Gir</p>
-                    <input type="text" placeholder="NOXA-XXXX-XXXX" class="w-full bg-black border border-white/10 p-3 rounded-lg text-sm mb-4 outline-none focus:border-blue-500">
-                    <button class="w-full bg-white text-black py-2 rounded-lg font-bold text-sm">AKTİFLEŞTİR</button>
+            <div class="mt-auto glass p-4 rounded-2xl border-blue-500/20">
+                <p class="text-[10px] text-gray-500 mb-1">YETKILI</p>
+                <p id="userName" class="font-bold text-sm">xSquze</p>
+                <div class="flex items-center mt-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
+                    <span id="serverNameDisp" class="text-xs text-gray-400 font-orbitron">WIA ROLEPLAY</span>
                 </div>
             </div>
-        </div>
-    </main>
+        </aside>
+
+        <main class="flex-1 p-10 overflow-y-auto bg-[#030303]">
+            <div id="tab-home" class="tab-content">
+                <div class="flex justify-between items-end mb-10">
+                    <div>
+                        <h2 class="text-4xl font-orbitron font-bold">Cloud <span class="text-blue-500">Panel</span></h2>
+                        <p class="text-gray-500 mt-2">Sunucunuz Noxa Cloud tarafından %100 korunuyor.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="glass p-6 rounded-3xl"><p class="text-xs text-gray-500 uppercase">Durum</p><p class="text-green-400 font-bold text-xl uppercase tracking-widest">AKTIF</p></div>
+                    <div class="glass p-6 rounded-3xl"><p class="text-xs text-gray-500 uppercase">Oyuncular</p><p id="count-players" class="text-2xl font-bold">42 / 128</p></div>
+                    <div class="glass p-6 rounded-3xl"><p class="text-xs text-gray-500 uppercase">Engellenen</p><p id="count-bans" class="text-2xl font-bold text-red-500">1,186</p></div>
+                    <div class="glass p-6 rounded-3xl"><p class="text-xs text-gray-500 uppercase">Lisans</p><p class="text-blue-500 font-bold text-sm uppercase">PREMIUM</p></div>
+                </div>
+
+                <div class="glass rounded-3xl p-8 border-l-4 border-blue-600">
+                    <h3 class="font-orbitron mb-6 flex items-center text-blue-500"><i class="fas fa-history mr-3"></i> Canlı Tespit Akışı</h3>
+                    <div id="liveLogs" class="space-y-4 max-h-[400px] overflow-y-auto pr-4">
+                        </div>
+                </div>
+            </div>
+
+            <div id="tab-players" class="tab-content hidden">
+                <h2 class="text-3xl font-orbitron mb-6">Aktif <span class="text-blue-500">Oyuncular</span></h2>
+                <div class="glass rounded-3xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5 text-gray-500 text-xs uppercase">
+                            <tr><th class="p-5">İsim</th><th class="p-5">ID</th><th class="p-5">İşlem</th></tr>
+                        </thead>
+                        <tbody id="playerTable">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentAuth = null;
+        const rawLink = "https://raw.githubusercontent.com/Metlofy/noxa-auth/refs/heads/main/licenses.json";
+
+        async function checkAuth() {
+            const input = document.getElementById('licenseInput').value;
+            try {
+                const response = await fetch(rawLink);
+                const data = await response.json();
+                
+                if (data[input] && data[input].active) {
+                    currentAuth = data[input];
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('mainDashboard').classList.remove('hidden');
+                    loadDashboard();
+                } else {
+                    showError();
+                }
+            } catch (e) { showError(); }
+        }
+
+        function showError() {
+            const err = document.getElementById('errorMsg');
+            err.style.opacity = '1';
+            setTimeout(() => err.style.opacity = '0', 3000);
+        }
+
+        function loadDashboard() {
+            document.getElementById('userName').innerText = currentAuth.owner;
+            document.getElementById('serverNameDisp').innerText = (currentAuth.owner + " SERVER").toUpperCase();
+            
+            // Logları oluştur
+            const logs = [
+                { user: "User#5173", reason: "NoClip Detected", time: "2m ago" },
+                { user: "Hileci_Baba", reason: "GodMode Attempt", time: "15m ago" },
+                { user: "Tester_1", reason: "Trigger Event Blocked", time: "1h ago" }
+            ];
+            
+            const logContainer = document.getElementById('liveLogs');
+            logContainer.innerHTML = logs.map(l => `
+                <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border-l-2 border-red-500/50 hover:bg-white/10 transition">
+                    <div class="flex items-center">
+                        <span class="bg-red-500 text-[10px] font-bold px-2 py-1 rounded mr-4">BAN</span>
+                        <p class="text-sm font-bold">${l.user} <span class="text-gray-500 font-normal ml-2">${l.reason}</span></p>
+                    </div>
+                    <span class="text-[10px] text-gray-600 font-orbitron">${l.time}</span>
+                </div>
+            `).join('');
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab'));
+            event.currentTarget.classList.add('active-tab');
+        }
+
+        function downloadResource() {
+            alert("Noxa v2.3.2 Kaynağı İndiriliyor...\nKurulum için 'server.lua' dosyasındaki userKey kısmına lisansınızı yazın.");
+            window.open("https://github.com/Metlofy/noxa-auth/archive/refs/heads/main.zip", "_blank");
+        }
+    </script>
 </body>
 </html>
