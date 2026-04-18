@@ -1,36 +1,159 @@
-// LİSANS GİRİŞİNDEN SONRA ÇALIŞACAK MANTIK
-function onLicenseSuccess(keyData) {
-    // 1. Önce sunucu var mı kontrol et
-    if (keyData.linkedServer == null) {
-        // EĞER YENİ LİSANSSA BURASI AÇILIR
-        showSetupGuide(); 
-    } else {
-        // EĞER SUNUCU KURULU VE AKTİFSE PANEL AÇILIR
-        showMainDashboard(keyData);
-    }
-}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Noxa Cloud | Next-Gen Protection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
+        
+        :root { --safir: #0066ff; --neon: #00d2ff; --dark: #050505; --card: rgba(15, 15, 15, 0.7); }
+        
+        body { background: var(--dark); color: white; font-family: 'Rajdhani', sans-serif; overflow: hidden; }
+        
+        /* Animasyonlu Arka Plan */
+        .bg-grid {
+            background-image: linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+        }
 
-function showSetupGuide() {
-    const content = `
-        <div class="setup-box glass p-10 rounded-[40px]">
-            <h2 class="text-blue-500 font-orbitron text-2xl mb-4">İLK KURULUM</h2>
-            <p class="text-gray-400 mb-6">Henüz bir sunucu bu lisansla eşleşmedi. Lütfen aşağıdaki adımları izle:</p>
-            
-            <div class="step mb-4 text-left bg-black/40 p-4 rounded-2xl border border-white/5">
-                <span class="text-blue-500 font-bold mr-2">1.</span> Dosyayı indir ve resources klasörüne at.
-            </div>
-            
-            <button onclick="downloadNoxa()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold mb-6 hover:bg-blue-500 transition">
-                <i class="fas fa-download mr-2"></i> NOXA V2.3.2 İNDİR
-            </button>
-            
-            <div class="step text-left bg-black/40 p-4 rounded-2xl border border-white/5">
-                <span class="text-blue-500 font-bold mr-2">2.</span> 'server.cfg' içine şunu ekle: <br>
-                <code class="text-xs text-green-500">ensure NoxaAnticheat</code>
-            </div>
-            
-            <p class="mt-6 text-xs text-yellow-500 animate-pulse italic">Sunucuyu başlattıktan sonra bu sayfa otomatik güncellenecektir...</p>
+        @keyframes gridMove { from { background-position: 0 0; } to { background-position: 0 40px; } }
+
+        .glass { background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(0, 102, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8); }
+        
+        .neon-border { position: relative; overflow: hidden; }
+        .neon-border::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, var(--safir), transparent 30%);
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        .inner-content { position: relative; z-index: 1; background: var(--dark); margin: 1px; height: calc(100% - 2px); border-radius: inherit; }
+
+        .tab-active { color: var(--neon); text-shadow: 0 0 10px var(--safir); border-right: 3px solid var(--safir); background: linear-gradient(90deg, rgba(0, 102, 255, 0.1) 0%, transparent 100%); }
+        
+        .pulse-red { animation: pulseRed 2s infinite; }
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
+    </style>
+</head>
+<body class="h-screen flex bg-grid">
+
+    <aside class="w-72 glass m-4 rounded-[30px] flex flex-col p-6 z-10">
+        <div class="mb-12 px-4">
+            <h1 class="font-orbitron text-2xl font-black tracking-tighter text-white">NOXA <span class="text-blue-500 italic text-sm">v2</span></h1>
+            <p class="text-[9px] text-blue-400 tracking-[4px] uppercase opacity-50">Cloud Infrastructure</p>
         </div>
-    `;
-    document.getElementById('main-view').innerHTML = content;
-}
+
+        <nav class="flex-1 space-y-3">
+            <button onclick="tab('dash')" class="w-full flex items-center p-4 rounded-2xl transition-all duration-300 tab-active" id="t-dash"><i class="fas fa-microchip mr-4"></i> Dashboard</button>
+            <button onclick="tab('setup')" class="w-full flex items-center p-4 rounded-2xl transition-all duration-300 text-gray-500 hover:text-white" id="t-setup"><i class="fas fa-terminal mr-4"></i> Kurulum</button>
+            <button onclick="tab('bans')" class="w-full flex items-center p-4 rounded-2xl transition-all duration-300 text-gray-500 hover:text-white" id="t-bans"><i class="fas fa-shield-virus mr-4"></i> Banlar</button>
+        </nav>
+
+        <div class="mt-auto p-4 rounded-3xl bg-blue-600/5 border border-blue-500/10">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] text-gray-500 uppercase">Server Status</span>
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+            </div>
+            <p id="serverDisplay" class="font-orbitron text-sm font-bold text-blue-500">BEKLENİYOR...</p>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto z-10">
+        <header class="flex justify-between items-center mb-12">
+            <div>
+                <h2 class="text-5xl font-black font-orbitron uppercase tracking-tighter" id="pageTitle">Live <span class="text-blue-600">Feed</span></h2>
+                <p class="text-gray-500 mt-2 font-medium">Gerçek zamanlı sunucu analitiği ve hile koruma verileri.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="glass px-6 py-3 rounded-2xl border-blue-500/20 text-center">
+                    <p class="text-[10px] text-gray-500 uppercase">Global Bans</p>
+                    <p class="font-orbitron text-xl font-bold">14,209</p>
+                </div>
+            </div>
+        </header>
+
+        <div id="view-dash" class="space-y-8 animate-fade-in">
+            <div class="grid grid-cols-3 gap-6">
+                <div class="glass p-8 rounded-[40px] relative overflow-hidden group">
+                    <i class="fas fa-users text-8xl absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform"></i>
+                    <p class="text-gray-500 text-sm font-bold uppercase mb-2">Aktif Oyuncu</p>
+                    <p class="text-4xl font-black font-orbitron">42<span class="text-gray-700 text-lg">/128</span></p>
+                </div>
+                <div class="glass p-8 rounded-[40px] border-l-4 border-red-600">
+                    <p class="text-gray-500 text-sm font-bold uppercase mb-2">Engellenen Tehdit</p>
+                    <p class="text-4xl font-black font-orbitron text-red-600">18</p>
+                </div>
+                <div class="glass p-8 rounded-[40px] border-l-4 border-blue-600">
+                    <p class="text-gray-500 text-sm font-bold uppercase mb-2">Cloud Ping</p>
+                    <p class="text-4xl font-black font-orbitron text-blue-400">14<span class="text-xs ml-1 font-normal opacity-50">ms</span></p>
+                </div>
+            </div>
+
+            <div class="glass rounded-[40px] p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-orbitron text-sm font-bold text-blue-500 tracking-[3px] uppercase">Tespit Günlüğü</h3>
+                    <span class="text-[10px] bg-blue-500/10 text-blue-500 px-3 py-1 rounded-full border border-blue-500/20">LIVE DATA</span>
+                </div>
+                <div class="space-y-4" id="logContainer">
+                    </div>
+            </div>
+        </div>
+
+        <div id="view-setup" class="hidden animate-fade-in flex flex-col items-center justify-center h-[70vh]">
+            <div class="max-w-xl w-full text-center">
+                <div class="mb-8 inline-block p-8 rounded-full bg-blue-600/10 border border-blue-500/20 pulse-red">
+                    <i class="fas fa-cloud-arrow-down text-5xl text-blue-500"></i>
+                </div>
+                <h3 class="text-3xl font-orbitron font-black mb-4">SUNUCUNU BAĞLA</h3>
+                <p class="text-gray-500 mb-10">Lisans doğrulandı. Şimdi aşağıdaki butondan scripti indir ve sunucuna kurarak paneli aktif et.</p>
+                
+                <div class="flex gap-4">
+                    <button onclick="alert('Indiriliyor...')" class="flex-1 bg-blue-600 hover:bg-blue-700 p-5 rounded-3xl font-bold transition-all transform hover:scale-105">
+                        <i class="fas fa-download mr-2"></i> NOXA_AC.ZIP
+                    </button>
+                    <button class="glass px-8 rounded-3xl hover:bg-white/5 transition-all">
+                        <i class="fas fa-book mr-2"></i> REHBER
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function tab(name) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + name).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-white'));
+            document.getElementById('t-' + name).classList.add('tab-active');
+        }
+
+        // Simüle Log Akışı
+        const logs = [
+            { user: "ID: 42", reason: "Anti-Aimbot Trigger", time: "Just now" },
+            { user: "ID: 109", reason: "Weapon Spawn Attempt", time: "2m ago" }
+        ];
+
+        document.getElementById('logContainer').innerHTML = logs.map(l => `
+            <div class="flex items-center justify-between p-5 bg-white/[0.02] rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all cursor-pointer group">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center mr-6">
+                        <i class="fas fa-user-shield text-red-500"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-lg group-hover:text-blue-400 transition-colors">${l.user}</p>
+                        <p class="text-xs text-gray-500 uppercase tracking-widest">${l.reason}</p>
+                    </div>
+                </div>
+                <span class="text-[10px] font-orbitron opacity-40">${l.time}</span>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
